@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>四组新闻：学校食堂——爱还是恨</title>
-    <link rel="icon" type="image/png" href="icon_png.png" />
-    <!-- 预加载首屏 LCP 图片（一碗饭）的 WebP 版本，加速首屏渲染 -->
+    <link rel="icon" type="image/webp" href="icon_png.webp" />
+    <!-- 预加载首屏 LCP 图片（一碗饭），加速首屏渲染 -->
     <link rel="preload" as="image" type="image/webp" href="png/start_1.webp" fetchpriority="high" />
     <style>
         /* ===== 标签 ===== */
@@ -302,7 +302,7 @@
         <header class="article-header">
             <div class="header-meta">
                 <div class="article-source">
-                    <img class="source-icon" src="icon_png.png" alt="网站图标" />
+                    <img class="source-icon" src="icon_png.webp" alt="网站图标" decoding="async" />
                     四组新闻<span class="separator">|</span><span>示例</span>
                 </div>
                 <div class="article-tags">
@@ -313,24 +313,28 @@
             <p class="article-staff">记者：陶俊宇  赵康晟，撰稿人：胡梓淼</p>
         </header>
 
-        <!-- ===== 图片 ===== -->
+        <!-- ===== 图片（首屏 LCP，立即加载并设为高优先级） ===== -->
         <figure class="image-wrapper">
             <img
-            src="png/start_1.png"
+            src="png/start_1.webp"
             alt="一碗饭"
-            loading="lazy"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
             />
             <figcaption class="image-caption">
                 <strong>一碗饭</strong>（网图）
             </figcaption>
         </figure>
 
-        <!-- ===== 第二张图片 ===== -->
+        <!-- ===== 第二张图片（非首屏，延迟加载并降低优先级） ===== -->
         <figure class="image-wrapper">
             <img
-            src="png/Zhao_Kangsheng_2.png"
+            src="png/Zhao_Kangsheng_2.webp"
             alt="赵康盛采访初二同学"
             loading="lazy"
+            fetchpriority="low"
+            decoding="async"
             />
             <figcaption class="image-caption">
                 <strong>赵康盛采访初二同学</strong>（摄影 李文尧）
