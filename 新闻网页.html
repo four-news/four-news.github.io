@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>四组新闻：学校食堂——爱还是恨</title>
+    <link rel="icon" type="image/png" href="icon_png.png" />
+    <style>
+        /* ===== 标签 ===== */
+        .article-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .article-tags .tag {
+            display: inline-block;
+            padding: 3px 12px;
+            font-size: 13px;
+            color: #fff;
+            background: #e63946;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f6f8;
+            color: #1e1e2a;
+            line-height: 1.7;
+            padding: 24px 16px;
+        }
+
+        /* ===== 容器 ===== */
+        .news-container {
+            max-width: 780px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            padding: 32px 36px 40px;
+        }
+
+        /* ===== 文章头部 ===== */
+        .article-header {
+            border-bottom: 1px solid #e9edf2;
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+        }
+
+        .article-source {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #7e8592;
+            margin-bottom: 0;
+        }
+        .article-source .source-icon {
+            height: 28px;
+            width: 28px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .article-source .separator {
+            margin: 0 6px;
+            color: #ccc;
+        }
+
+        /* ===== 头部元信息行：来源/时间靠左，民生标签靠右 ===== */
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .article-title {
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #0b0b16;
+            margin: 6px 0 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .article-staff {
+            font-size: 14px;
+            color: #7e8592;
+            margin-top: 8px;
+        }
+
+        /* ===== 图片 ===== */
+        .image-wrapper {
+            margin: 18px 0 24px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #eef1f5;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .image-caption {
+            padding: 10px 14px 12px;
+            font-size: 14px;
+            color: #6e7683;
+            background: #fafbfc;
+            border-top: 1px solid #eef1f5;
+        }
+        .image-caption strong {
+            color: #1e2a3a;
+            font-weight: 600;
+        }
+
+        /* ===== 正文（单段连续内容） ===== */
+        .article-body {
+            font-size: 17px;
+            color: #1f2a3a;
+        }
+        .article-body p {
+            margin: 0;
+            padding: 0;
+            text-align: justify;
+            word-break: break-word;
+            line-height: 1.8;
+        }
+
+        /* ===== 底部 ===== */
+        .article-footer {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid #e9edf2;
+            font-size: 14px;
+            color: #8e96a3;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* ===== 新闻团队按钮 ===== */
+        .team-btn {
+            padding: 6px 16px;
+            font-size: 14px;
+            color: #fff;
+            background: #2b6cb0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .team-btn:hover {
+            background: #1e4e8c;
+        }
+
+        /* ===== 模态窗口 ===== */
+        .modal-mask {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-mask.show {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9edf2;
+        }
+        .modal-header h3 {
+            font-size: 18px;
+            color: #0b0b16;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #8e96a3;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-body {
+            padding: 16px 20px 20px;
+        }
+        .team-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+        }
+        .team-table th,
+        .team-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eef1f5;
+        }
+        .team-table th {
+            background: #f7f9fc;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        .team-table tr:last-child td {
+            border-bottom: none;
+        }
+        .modal-note {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #9ca3af;
+            text-align: right;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 640px) {
+            body {
+                padding: 12px 10px;
+            }
+            .news-container {
+                padding: 20px 18px 28px;
+                border-radius: 8px;
+            }
+            .article-title {
+                font-size: 24px;
+            }
+            .article-body {
+                font-size: 15.5px;
+            }
+            .article-source {
+                font-size: 13px;
+            }
+            .image-caption {
+                font-size: 13px;
+                padding: 8px 12px 10px;
+            }
+            .article-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .article-title {
+                font-size: 20px;
+            }
+            .article-body {
+                font-size: 14px;
+            }
+            .news-container {
+                padding: 16px 14px 22px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0f2f5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd0d8;
+            border-radius: 6px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b0b7c2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="news-container">
+
+        <!-- ===== 文章头部 ===== -->
+        <header class="article-header">
+            <div class="header-meta">
+                <div class="article-source">
+                    <img class="source-icon" src="icon_png.png" alt="网站图标" />
+                    四组新闻<span class="separator">|</span><span>示例</span>
+                </div>
+                <div class="article-tags">
+                    <span class="tag">民生</span>
+                </div>
+            </div>
+            <h1 class="article-title">学校食堂——爱还是恨</h1>
+            <p class="article-staff">记者：陶俊宇  赵康晟，撰稿人：胡梓淼</p>
+        </header>
+
+        <!-- ===== 图片 ===== -->
+        <figure class="image-wrapper">
+            <img
+            src="png/start_1.png"
+            alt="一碗饭"
+            loading="lazy"
+            />
+            <figcaption class="image-caption">
+                <strong>一碗饭</strong>（网图）
+            </figcaption>
+        </figure>
+
+        <!-- ===== 第二张图片 ===== -->
+        <figure class="image-wrapper">
+            <img
+            src="png/Zhao_Kangsheng_2.png"
+            alt="赵康盛采访初二同学"
+            loading="lazy"
+            />
+            <figcaption class="image-caption">
+                <strong>赵康盛采访初二同学</strong>（摄影 李文尧）
+            </figcaption>
+        </figure>
+
+        <!-- ===== 正文：100条“示例内容”合并为单个连续段落 ===== -->
+        <div class="article-body">
+            <p id="exampleParagraph">
+                <!-- 由 JavaScript 生成 100 条 "示例内容"，用空格分隔 -->
+            </p>
+        </div>
+
+        <!-- ===== 底部 ===== -->
+        <footer class="article-footer">
+            <div class="footer-left">
+                <span>四组新闻</span>
+                <span>示例</span>
+            </div>
+            <button class="team-btn" id="teamBtn">新闻团队</button>
+        </footer>
+
+    </div>
+
+    <!-- ===== 新闻团队模态窗口 ===== -->
+    <div class="modal-mask" id="teamModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>新闻团队</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table class="team-table">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>职责</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>陈安妮</td><td>记录员</td></tr>
+                        <tr><td>胡梓淼</td><td>撰稿人</td></tr>
+                        <tr><td>李文尧</td><td>后勤/摄影</td></tr>
+                        <tr><td>罗舜馨</td><td>组长</td></tr>
+                        <tr><td>陶俊宇</td><td>记者</td></tr>
+                        <tr><td>张羽墨</td><td>后勤/摄影</td></tr>
+                        <tr><td>赵康晟</td><td>记者</td></tr>
+                    </tbody>
+                </table>
+                <p class="modal-note">注：根据姓名首字母排序</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const p = document.getElementById('exampleParagraph');
+            if (!p) return;
+
+            const TOTAL = 100;
+            // 生成 100 个 "示例内容"，用空格连接成一个字符串
+            const contentArray = new Array(TOTAL).fill('示例内容');
+            const finalText = contentArray.join(' ');  // 中间用空格分隔
+
+            p.textContent = finalText;
+
+            console.log('✅ 已生成 ' + TOTAL + ' 条 "示例内容"，合并为单个段落');
+        })();
+
+        // ===== 新闻团队模态窗口 =====
+        (function() {
+            const btn = document.getElementById('teamBtn');
+            const modal = document.getElementById('teamModal');
+            const closeBtn = document.getElementById('modalClose');
+
+            if (!btn || !modal) return;
+
+            btn.addEventListener('click', function() {
+                modal.classList.add('show');
+            });
+
+            closeBtn.addEventListener('click', function() {
+                modal.classList.remove('show');
+            });
+
+            // 点击遮罩关闭
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
