@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ 雷霆 ⚡</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 0%, #2b2f4a 0%, #12131c 60%, #08090d 100%);
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #e8ebff;
+    padding: 24px;
+  }
+
+  main {
+    width: 100%;
+    max-width: 820px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 28px;
+    letter-spacing: 6px;
+    margin: 0 0 18px;
+    background: linear-gradient(90deg, #7cf7ff, #b18cff, #ffd36e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 24px rgba(124, 247, 255, .25);
+  }
+
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 68vh;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .65), 0 0 0 1px rgba(255, 255, 255, .07);
+  }
+
+  /* 两个视频完全重叠，靠透明度切换 */
+  .video-wrap video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    display: block;
+    transition: opacity .25s ease;
+  }
+
+  #mainVideo  { opacity: 1; z-index: 1; }
+  #laughVideo { opacity: 0; z-index: 2; pointer-events: none; }
+
+  /* 笑声播放中：笑声视频显示，主视频隐藏 */
+  .video-wrap.laughing #laughVideo { opacity: 1; }
+  .video-wrap.laughing #mainVideo  { opacity: 0; pointer-events: none; }
+
+  /* 当前正在播放哪支片子的角标 */
+  .badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 5;
+    padding: 5px 12px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .55);
+    backdrop-filter: blur(6px);
+    color: #9fb0ff;
+    border: 1px solid rgba(255, 255, 255, .12);
+    transition: .25s;
+  }
+  .video-wrap.laughing .badge {
+    color: #fff;
+    background: rgba(255, 45, 85, .8);
+    border-color: rgba(255, 255, 255, .3);
+  }
+
+  #laughBtn {
+    margin-top: 26px;
+    padding: 16px 42px;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #10121c;
+    background: linear-gradient(135deg, #ffe066, #ffb347);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .25s ease, filter .2s ease;
+    box-shadow: 0 10px 28px rgba(255, 179, 71, .35);
+  }
+
+  #laughBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgba(255, 179, 71, .5);
+    filter: brightness(1.06);
+  }
+
+  #laughBtn:active {
+    transform: translateY(1px) scale(.98);
+  }
+
+  #laughBtn.playing {
+    color: #fff;
+    background: linear-gradient(135deg, #ff5f6d, #ff2d55);
+    box-shadow: 0 10px 28px rgba(255, 45, 85, .45);
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.045); }
+  }
+
+  .hint {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #7d84a8;
+    line-height: 1.7;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(255, 60, 90, .95);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    opacity: 0;
+    transition: .3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<main>
+  <h1>雷 霆</h1>
+
+  <div class="video-wrap" id="videoWrap">
+    <span class="badge" id="badge">雷霆.mp4</span>
+
+    <!-- 主视频：手动播放（controls），不自动播放 -->
+    <video id="mainVideo" src="雷霆.mp4" controls preload="metadata" playsinline>
+      你的浏览器不支持 video 标签。
+    </video>
+
+    <!-- 笑声视频：默认隐藏，循环播放，播放时替换掉主视频的画面 -->
+    <video id="laughVideo" src="雷霆笑声.mp4" loop preload="auto" playsinline></video>
+  </div>
+
+  <button id="laughBtn">😂 循环播放雷霆笑声</button>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const wrap       = document.getElementById('videoWrap');
+  const badge      = document.getElementById('badge');
+  const mainVideo  = document.getElementById('mainVideo');
+  const laughVideo = document.getElementById('laughVideo');
+  const btn        = document.getElementById('laughBtn');
+  const toast      = document.getElementById('toast');
+
+  let toastTimer = null;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+
+  // 点击按钮：切换 主视频 <-> 笑声视频
+  btn.addEventListener('click', async () => {
+    if (laughVideo.paused) {
+      // ===== 开始播放笑声：替换掉主视频 =====
+      mainVideo.pause();               // 主视频暂停（保留进度，停止后回到原画面）
+
+      wrap.classList.add('laughing');  // 画面淡入切换
+      badge.textContent = '雷霆笑声.mp4';
+
+      laughVideo.currentTime = 0;
+      try {
+        await laughVideo.play();       // 循环播放（loop 属性）
+        btn.classList.add('playing');
+        btn.textContent = '⏹ 停止雷霆笑声';
+      } catch (err) {
+        console.error(err);
+        wrap.classList.remove('laughing');
+        badge.textContent = '雷霆.mp4';
+        showToast('无法播放「雷霆笑声.mp4」，请检查文件是否在同一目录下');
+      }
+    } else {
+      // ===== 停止笑声：恢复主视频 =====
+      laughVideo.pause();
+      laughVideo.currentTime = 0;
+
+      wrap.classList.remove('laughing');
+      badge.textContent = '雷霆.mp4';
+
+      btn.classList.remove('playing');
+      btn.textContent = '😂 循环播放雷霆笑声';
+    }
+  });
+
+  // 文件加载失败提示
+  mainVideo.addEventListener('error', () => {
+    showToast('找不到「雷霆.mp4」，请确认它和网页在同一目录下');
+  });
+  laughVideo.addEventListener('error', () => {
+    showToast('找不到「雷霆笑声.mp4」，请确认它和网页在同一目录下');
+  });
+</script>
+
+</body>
+</html>
